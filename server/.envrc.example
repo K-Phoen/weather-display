@@ -1,0 +1,7 @@
+export OWM_API_KEY=""
+export LATITUDE=""
+export LONGITUDE=""
+export CALDAV_URL="https://host/dav/calendars"
+export CALDAV_USERNAME=""
+export CALDAV_PASSWORD=""
+export SHARED_TOKEN="totally-secure-token"

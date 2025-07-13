@@ -1,8 +1,9 @@
-import datetime, requests, os, time
+import datetime, functools, requests, os, time
 from caldav.davclient import get_davclient
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
-from flask import Flask
+from flask import Flask, request
+from hmac import compare_digest
 
 
 app = Flask(__name__)
@@ -49,14 +50,6 @@ def fetch_air_pollution_data(apikey: str, latitude: str, longitude: str):
     end = int(time.time())
     start = end - ((3600 * OWM_NUM_AIR_POLLUTION) - 1)
 
-    print({
-        'lat': latitude,
-        'lon': longitude,
-        'appid': apikey,
-        'start': start,
-        'end': end,
-    })
-
     response = requests.get('https://api.openweathermap.org/data/2.5/air_pollution/history', params={
         'lat': latitude,
         'lon': longitude,
@@ -66,7 +59,6 @@ def fetch_air_pollution_data(apikey: str, latitude: str, longitude: str):
     })
 
     if response.status_code != 200:
-        print(response.content)
         raise RuntimeError(f"unexpected response status from OpenWeatherMap air_pollution: {response.status_code}")
 
     return response.json()
@@ -142,7 +134,20 @@ def require_env_str(name: str) -> str:
     return value
 
 
+def api_token_required(func):
+    @functools.wraps(func)
+    def decorator(*args, **kwargs):
+        api_key = request.headers.get("Authorization", "")
+
+        if compare_digest(require_env_str("SHARED_TOKEN"), api_key):
+            return func(*args, **kwargs)
+
+        return {"error": "Invalid API key"}, 403
+    return decorator
+
+
 @app.get("/api/combined")
+@api_token_required
 def api_combined():
     events = []
     weather_data = {}
