@@ -1,0 +1,11 @@
+name: CI
+on: [pull_request]
+
+jobs:
+  build_server:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - run: make -C server build
