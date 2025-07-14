@@ -1,6 +1,6 @@
 import datetime, functools, requests, os, time
 from caldav.davclient import get_davclient
-from datetime import datetime
+from datetime import datetime, timezone
 from dateutil.relativedelta import relativedelta
 from flask import Flask, request
 from hmac import compare_digest
@@ -10,6 +10,7 @@ app = Flask(__name__)
 
 
 OWM_NUM_AIR_POLLUTION = 24 # Depending on AQI scale, hourly concentrations will need to be averaged over a period of 1h to 24h
+CALENDAR_EVENTS = 6 # Max number of calendar events to return
 
 
 def fetch_events(calendar_url: str) -> list[dict[str, str]]:
@@ -29,6 +30,9 @@ def fetch_events(calendar_url: str) -> list[dict[str, str]]:
             if component.name != "VEVENT":
                 continue
 
+            if len(results) >= CALENDAR_EVENTS:
+                break
+
             results.append(format_event(component))
 
     return results
@@ -37,11 +41,11 @@ def fetch_events(calendar_url: str) -> list[dict[str, str]]:
 def format_event(component) -> dict[str, str]:
     event = {
         "summary": component.get("summary"),
-        "start": component.start.strftime("%Y-%m-%d %H:%M"),
+        "start": int(component.start.replace(tzinfo=timezone.utc).timestamp()),
     }
 
     if component.end:
-        event["end"] = component.end.strftime("%Y-%m-%d %H:%M")
+        event["end"] = int(component.end.replace(tzinfo=timezone.utc).timestamp())
 
     return event
 
@@ -122,7 +126,6 @@ def format_weather_data(data):
                 "weather": daily["weather"],
             } for daily in data["daily"]
         ],
-        "alerts": data.get("alerts", []),
     }
 
 
