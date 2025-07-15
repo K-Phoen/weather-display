@@ -30,12 +30,11 @@ def fetch_events(calendar_url: str) -> list[dict[str, str]]:
             if component.name != "VEVENT":
                 continue
 
-            if len(results) >= CALENDAR_EVENTS:
-                break
-
             results.append(format_event(component))
 
-    return results
+    results = sorted(results, key=lambda event: event["start"])
+
+    return results if len(results) <= CALENDAR_EVENTS else results[:CALENDAR_EVENTS]
 
 
 def format_event(component) -> dict[str, str]:
