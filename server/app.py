@@ -41,11 +41,11 @@ def fetch_events(calendar_url: str) -> list[dict[str, str]]:
 def format_event(component) -> dict[str, str]:
     event = {
         "summary": component.get("summary"),
-        "start": int(component.start.replace(tzinfo=timezone.utc).timestamp()),
+        "start": int(component.start.timestamp()),
     }
 
     if component.end:
-        event["end"] = int(component.end.replace(tzinfo=timezone.utc).timestamp())
+        event["end"] = int(component.end.timestamp())
 
     return event
 
