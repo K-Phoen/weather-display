@@ -45,7 +45,7 @@ def format_event(component) -> dict[str, str]:
     }
 
     if len(event["summary"]) > EVENT_TITLE_MAX_LEN:
-        event["summary"] = event["summary"][:EVENT_TITLE_MAX_LEN-1] + "…"
+        event["summary"] = event["summary"][:EVENT_TITLE_MAX_LEN]
 
     if component.end:
         event["end"] = int(component.end.timestamp())
