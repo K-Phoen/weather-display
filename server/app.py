@@ -11,7 +11,7 @@ app = Flask(__name__)
 
 OWM_NUM_AIR_POLLUTION = 24 # Depending on AQI scale, hourly concentrations will need to be averaged over a period of 1h to 24h
 CALENDAR_EVENTS = 6 # Max number of calendar events to return
-EVENT_TITLE_MAX_LEN = 27
+EVENT_TITLE_MAX_LEN = 24
 
 
 def fetch_events(calendar_url: str) -> list[dict[str, str]]:
