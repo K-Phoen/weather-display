@@ -3,6 +3,6 @@ FROM ghcr.io/astral-sh/uv:python3.13-alpine
 ADD . /app
 
 WORKDIR /app
-RUN uv sync --locked
+RUN uv --no-cache sync --locked
 
-CMD ["uv", "run", "waitress-serve", "--host", "0.0.0.0", "app.app"]
+CMD ["uv", "--no-cache", "run", "waitress-serve", "--host", "0.0.0.0", "app.app"]
