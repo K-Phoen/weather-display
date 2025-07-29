@@ -1,0 +1,5 @@
+export WIFI_SSID=""
+export WIFI_PASSWORD=""
+export PROM_PUSH_USER=""
+export PROM_PUSH_PASS=""
+export SERVER_SHARED_SECRET=""
