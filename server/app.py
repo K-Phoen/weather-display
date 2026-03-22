@@ -1,6 +1,6 @@
 import datetime, functools, requests, os, time
 from caldav.davclient import get_davclient
-from datetime import datetime, timezone
+from datetime import datetime, date
 from dateutil.relativedelta import relativedelta
 from flask import Flask, request
 from hmac import compare_digest
@@ -41,14 +41,17 @@ def fetch_events(calendar_url: str) -> list[dict[str, str]]:
 def format_event(component) -> dict[str, str]:
     event = {
         "summary": component.get("summary"),
-        "start": int(component.start.timestamp()),
     }
+
+    start = component.start if isinstance(component.start, datetime) else datetime.combine(component.start, datetime.min.time())
+    event["start"] = int(start.timestamp())
 
     if len(event["summary"]) > EVENT_TITLE_MAX_LEN:
         event["summary"] = event["summary"][:EVENT_TITLE_MAX_LEN]
 
     if component.end:
-        event["end"] = int(component.end.timestamp())
+        end = component.end if isinstance(component.end, datetime) else datetime.combine(component.end, datetime.min.time())
+        event["end"] = int(end.timestamp())
 
     return event
 
@@ -171,7 +174,7 @@ def api_combined():
             longitude=require_env_str("LONGITUDE"),
         )
     except Exception as e:
-        app.logger.warning("could not fetch calendar events: %s", e)
+        app.logger.warning("could not fetch air pollution data: %s", e)
 
     try:
         weather_data = fetch_weather_data(
